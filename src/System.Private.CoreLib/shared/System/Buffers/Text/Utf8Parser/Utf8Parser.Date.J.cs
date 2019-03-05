@@ -50,32 +50,46 @@ namespace System.Buffers.Text
 				{
 					case Utf8Constants.DateJParserState.Year:
 						if (source.Length - sourceIndex < 4)
+						{
 							return false;
+						}
 
-						uint digit1 = source[sourceIndex++] - (uint)0;
-						uint digit2 = source[sourceIndex++] - (uint)0;
-						uint digit3 = source[sourceIndex++] - (uint)0;
-						uint digit4 = source[sourceIndex++] - (uint)0;
+						uint digit1 = source[sourceIndex++] - (uint)'0';
+						uint digit2 = source[sourceIndex++] - (uint)'0';
+						uint digit3 = source[sourceIndex++] - (uint)'0';
+						uint digit4 = source[sourceIndex++] - (uint)'0';
 
 						if (digit1 > 9 || digit2 > 9 || digit3 > 9 || digit4 > 9)
+						{
 							return false;
+						}
 
 						year = (int)(digit1 * 1000 + digit2 * 100 + digit3 * 10 + digit4);
 
 						if ((sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Hyphen))
+						{
 							state = Utf8Constants.DateJParserState.Month;
+						}
 						else
+						{
 							return false;
+						}
 						break;
 					case Utf8Constants.DateJParserState.Month:
 						if (ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out month) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Hyphen))
+						{
 							state = Utf8Constants.DateJParserState.Day;
+						}
 						else
+						{
 							return false;
+						}
 						break;
 					case Utf8Constants.DateJParserState.Day:
 						if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out day))
+						{
 							return false;
+						}
 
 						if (sourceLength - sourceIndex > 1)
 						{
@@ -97,23 +111,29 @@ namespace System.Buffers.Text
 						break;
 					case Utf8Constants.DateJParserState.Hour:
 						if (ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out hour) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Colon))
+						{
 							state = Utf8Constants.DateJParserState.Minute;
+						}
 						else
+						{
 							return false;
+						}
 						break;
 					case Utf8Constants.DateJParserState.Minute:
 						if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out minute))
+						{
 							return false;
+						}
 
 						if (sourceLength - sourceIndex > 1)
 						{
-                            switch (source[sourceIndex])
+							switch (source[sourceIndex])
 							{
 								case Utf8Constants.Colon:
 									state = Utf8Constants.DateJParserState.Second;
 									sourceIndex++;
 									break;
-                                case Utf8Constants.UtcOffsetChar:
+								case Utf8Constants.UtcOffsetChar:
 									offsetChar = Utf8Constants.UtcOffsetChar;
 									continueParsing = false;
 									sourceIndex++;
@@ -136,7 +156,9 @@ namespace System.Buffers.Text
 						break;
 					case Utf8Constants.DateJParserState.Second:
 						if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out second))
+						{
 							return false;
+						}
 
 						if (sourceLength - sourceIndex > 1)
 						{
@@ -163,7 +185,6 @@ namespace System.Buffers.Text
 									break;
 								default:
 									continueParsing = false;
-									sourceIndex++;
 									break;
 							}
 						}
@@ -171,23 +192,27 @@ namespace System.Buffers.Text
 					case Utf8Constants.DateJParserState.Fraction:
 						while (sourceIndex < sourceLength && ParserHelpers.IsDigit(source[sourceIndex]))
 						{
-							if (!((fraction * 10) + (int)(source[sourceIndex] - (uint)0) <= Utf8Constants.MaxDateTimeFraction))
+							if (!((fraction * 10) + (int)(source[sourceIndex] - (uint)'0') <= Utf8Constants.MaxDateTimeFraction))
 							{
 								sourceIndex++;
 								break;
 							}
 
-							fraction = (fraction * 10) + (int)(source[sourceIndex++] - (uint)0);
+							fraction = (fraction * 10) + (int)(source[sourceIndex++] - (uint)'0');
 						}
 
 						if (fraction != 0)
 						{
 							while (fraction * 10 <= Utf8Constants.MaxDateTimeFraction)
+							{
 								fraction *= 10;
+							}
 						}
 
 						if (sourceIndex == sourceLength)
+						{
 							break;
+						}
 
 						switch (source[sourceIndex])
 						{
@@ -213,13 +238,19 @@ namespace System.Buffers.Text
 						break;
 					case Utf8Constants.DateJParserState.OffsetHours:
 						if (ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetHours) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Colon))
+						{
 							state = Utf8Constants.DateJParserState.OffsetMinutes;
+						}
 						else
+						{
 							return false;
+						}
 						break;
 					case Utf8Constants.DateJParserState.OffsetMinutes:
 						if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetMinutes))
+						{
 							return false;
+						}
 
 						continueParsing = false;
 						break;

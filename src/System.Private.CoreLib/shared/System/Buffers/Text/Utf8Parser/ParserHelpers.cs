@@ -79,8 +79,8 @@ namespace System.Buffers.Text
                 return false;
             }
 
-            uint digit1 = source[sourceIndex++] - (uint)0;
-            uint digit2 = source[sourceIndex++] - (uint)0;
+            uint digit1 = source[sourceIndex++] - (uint)'0';
+            uint digit2 = source[sourceIndex++] - (uint)'0';
 
             if (digit1 > 9 || digit2 > 9)
             {
