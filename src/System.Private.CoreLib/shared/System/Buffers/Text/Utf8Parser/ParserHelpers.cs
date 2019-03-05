@@ -71,19 +71,16 @@ namespace System.Buffers.Text
             return TryParseThrowFormatException(out bytesConsumed);
         }
 
-        public static bool TryGetNextTwoDigits(ReadOnlySpan<byte> source, int prevSourceIndex, out int sourceIndex, out int value)
+        public static bool TryGetNextTwoDigits(ReadOnlySpan<byte> source, ref int sourceIndex, out int value)
         {
-            if (source.Length - prevSourceIndex < 2)
+            if (source.Length - sourceIndex < 2)
             {
-                sourceIndex = prevSourceIndex;
                 value = default;
                 return false;
             }
 
-            uint digit1 = source[prevSourceIndex++] - 48u;
-            uint digit2 = source[prevSourceIndex++] - 48u;
-
-            sourceIndex = prevSourceIndex;
+            uint digit1 = source[sourceIndex++] - (uint)0;
+            uint digit2 = source[sourceIndex++] - (uint)0;
 
             if (digit1 > 9 || digit2 > 9)
             {

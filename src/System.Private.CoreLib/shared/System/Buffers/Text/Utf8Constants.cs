@@ -44,7 +44,6 @@ namespace System.Buffers.Text
 			Fraction = 6,
 			OffsetHours = 7,
 			OffsetMinutes = 8,
-			Invalid = 9,
 		}
     }
 }
