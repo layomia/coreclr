@@ -32,18 +32,5 @@ namespace System.Buffers.Text
 
         public const ulong BillionMaxUIntValue = (ulong)uint.MaxValue * Billion; // maximum value that can be split into two uint32 {1-10 digits}{9 digits}
         public const uint Billion = 1000000000; // 10^9, used to split int64/uint64 into three uint32 {1-2 digits}{9 digits}{9 digits}
-
-        public enum DateJParserState
-		{
-			Year = 0,
-			Month = 1,
-			Day = 2,
-			Hour = 3,
-			Minute = 4,
-			Second = 5,
-			Fraction = 6,
-			OffsetHours = 7,
-			OffsetMinutes = 8,
-		}
     }
 }
