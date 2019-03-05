@@ -65,19 +65,20 @@ namespace System.Buffers.Text
 				return false;
 			}
 
-			// Parse month.
-			if (!(ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out month) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Hyphen)))
+			// Parse month and day.
+			if (!(ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out month) &&
+				(sourceLength - sourceIndex > 1) &&
+				(source[sourceIndex++] == Utf8Constants.Hyphen) &&
+				ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out day)))
 			{
 				return false;
 			}
 
-			// Parse day.
-			if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out day))
+			if (sourceLength - sourceIndex < 1)
 			{
-				return false;
+				goto FinishedParsing;
 			}
-
-			if (sourceLength - sourceIndex > 1)
+			else
 			{
 				switch (source[sourceIndex])
 				{
@@ -87,26 +88,27 @@ namespace System.Buffers.Text
 						return false;
 					case Utf8Constants.TimePrefix:
 						sourceIndex++;
-						// Continue to parse hour.
+						// Continue to parse hour and minute.
 						break;
 					default:
 						goto FinishedParsing;
 				}
 			}
 
-			// Parse hour.
-			if (!(ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out hour) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Colon)))
+			// Parse hour and minute.
+			if (!(ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out hour) &&
+				(sourceLength - sourceIndex > 1) &&
+				(source[sourceIndex++] == Utf8Constants.Colon) &&
+				ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out minute)))
 			{
 				return false;
 			}
 
-			// Parse minute
-			if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out minute))
+			if (sourceLength - sourceIndex < 1)
 			{
-				return false;
+				goto FinishedParsing;
 			}
-
-			if (sourceLength - sourceIndex > 1)
+			else
 			{
 				switch (source[sourceIndex])
 				{
@@ -115,11 +117,8 @@ namespace System.Buffers.Text
 						sourceIndex++;
 						goto FinishedParsing;
 					case Utf8Constants.Plus:
-						offsetChar = Utf8Constants.Plus;
-						sourceIndex++;
-						goto ParseOffset;
 					case Utf8Constants.Minus:
-						offsetChar = Utf8Constants.Minus;
+						offsetChar = source[sourceIndex];
 						sourceIndex++;
 						goto ParseOffset;
 					case Utf8Constants.Colon:
@@ -137,7 +136,11 @@ namespace System.Buffers.Text
 				return false;
 			}
 
-			if (sourceLength - sourceIndex > 1)
+			if (sourceLength - sourceIndex < 1)
+			{
+				goto FinishedParsing;
+			}
+			else
 			{
 				switch (source[sourceIndex])
 				{
@@ -200,24 +203,18 @@ namespace System.Buffers.Text
 			}
 
 		ParseOffset:
-			if (ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetHours) && (sourceLength - sourceIndex > 1) && (source[sourceIndex++] == Utf8Constants.Colon))
-			{
-				state = Utf8Constants.DateJParserState.OffsetMinutes;
-			}
-			else
-			{
-				return false;
-			}
-
-			if (!ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetMinutes))
+			// Parse offset hours and minutes.
+			if (!(ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetHours) &&
+				(sourceLength - sourceIndex > 1) &&
+				(source[sourceIndex++] == Utf8Constants.Colon) &&
+				ParserHelpers.TryGetNextTwoDigits(source, ref sourceIndex, out offsetMinutes)))
 			{
 				return false;
 			}
-
 			goto FinishedParsing;
 
 		FinishedParsing:
-            bytesConsumed = sourceIndex;
+			bytesConsumed = sourceIndex;
 
 			if ((offsetChar != Utf8Constants.UtcOffsetChar) && (offsetChar != Utf8Constants.Plus) && (offsetChar != Utf8Constants.Minus))
 			{
